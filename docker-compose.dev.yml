@@ -1,0 +1,87 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: vireo-app-dev
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - APPLICATION_PORT=3000
+      - AWS_REGION=us-east-1
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:8080
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - db
+      - cache
+      - queue
+    command: npm run dev
+    networks:
+      - vireo-network
+
+  db:
+    image: mysql:8.0
+    container_name: vireo-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vireo_dev
+      MYSQL_USER: vireo
+      MYSQL_PASSWORD: vireo123
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - vireo-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: vireo-redis-dev
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    networks:
+      - vireo-network
+
+  queue:
+    image: rabbitmq:3-management-alpine
+    container_name: vireo-rabbitmq-dev
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: vireo
+      RABBITMQ_DEFAULT_PASS: vireo123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - vireo-network
+
+  dlq:
+    image: rabbitmq:3-management-alpine
+    container_name: vireo-dlq-dev
+    ports:
+      - '5673:5672'
+      - '15673:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: vireo
+      RABBITMQ_DEFAULT_PASS: vireo123
+    volumes:
+      - rabbitmq-dlq-data:/var/lib/rabbitmq
+    networks:
+      - vireo-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+  rabbitmq-dlq-data:
+
+networks:
+  vireo-network:
+    driver: bridge

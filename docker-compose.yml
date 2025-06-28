@@ -1,0 +1,84 @@
+services:
+  app:
+    build: .
+    container_name: vireo-app
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - APPLICATION_PORT=3000
+      - AWS_REGION=us-east-1
+    depends_on:
+      - db
+      - cache
+      - queue
+    networks:
+      - vireo-network
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: vireo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-vireo}
+      MYSQL_USER: ${MYSQL_USER:-vireo}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-vireo123}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - vireo-network
+    restart: unless-stopped
+
+  cache:
+    image: redis:7-alpine
+    container_name: vireo-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    networks:
+      - vireo-network
+    restart: unless-stopped
+
+  queue:
+    image: rabbitmq:3-management-alpine
+    container_name: vireo-rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-vireo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-vireo123}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - vireo-network
+    restart: unless-stopped
+
+  dlq:
+    image: rabbitmq:3-management-alpine
+    container_name: vireo-dlq
+    ports:
+      - '5673:5672'
+      - '15673:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DLQ_USER:-vireo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DLQ_PASSWORD:-vireo123}
+    volumes:
+      - rabbitmq-dlq-data:/var/lib/rabbitmq
+    networks:
+      - vireo-network
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+  rabbitmq-dlq-data:
+
+networks:
+  vireo-network:
+    driver: bridge

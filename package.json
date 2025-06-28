@@ -1,0 +1,53 @@
+{
+  "name": "vireo",
+  "version": "1.0.0",
+  "description": "A lightweight, high-performance API gateway built with Node.js and TypeScript that provides essential gateway functionality ",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "nodemon dist/index.js",
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No tests yet\" && exit 0",
+    "style-fix": "prettier --write .",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "unit-tests": "jest --config jest.uspec.config.js",
+    "integrations-tests": "jest --config jest.ispec.config.js"
+  },
+  "keywords": [
+    "api-gateway",
+    "koa",
+    "typescript"
+  ],
+  "author": "Alok",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^13.1.0",
+    "@types/koa": "^2.15.0",
+    "@types/lodash": "^4.17.19",
+    "dotenv": "^17.0.0",
+    "ioredis": "^5.6.1",
+    "koa": "^3.0.0",
+    "koa-helmet": "^8.0.1",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^13.0.1",
+    "lodash": "^4.17.21",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/koa__cors": "^5.0.0",
+    "@types/koa__router": "^12.0.4",
+    "@types/koa-logger": "^3.1.5",
+    "@types/koa-router": "^7.4.8",
+    "@types/node": "^22.15.12",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "eslint": "^9.30.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
