@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    {
+      "name": "sample-plugin",
+      "version": "1.0.0",
+      "priority": 100,
+      "onRequest": "function(ctx, pluginCtx) { ctx.set('X-Sample-Plugin', 'active'); }"
+    }
+  ],
+  "routes": [
+    {
+      "id": "route-1",
+      "name": "Sample Route",
+      "methods": ["GET"],
+      "paths": ["/ok"],
+      "downstream": {
+        "name": "test-app-nginx",
+        "hosts": ["http://test-app-nginx:3008"]
+      },
+      "plugins": ["sample-plugin"]
+    }
+  ]
+} 
