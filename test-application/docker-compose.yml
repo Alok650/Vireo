@@ -1,0 +1,12 @@
+services:
+  lab-nginx:
+    build: .
+    container_name: test-app-nginx
+    ports:
+      - '3008:3008'
+    networks:
+      - vireo_vireo-network
+
+networks:
+  vireo_vireo-network:
+    external: true

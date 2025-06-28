@@ -3,16 +3,18 @@ import helmet from 'koa-helmet';
 import logger from 'koa-logger';
 import { get, isNil } from 'lodash';
 import { environmentManager, getCorsConfig, corsMiddleware } from './config';
-import { PluginManager } from './plugins/PluginManager';
+import { GatewayCoreService, GatewayPlugin, Route } from './plugins/gateway-core';
+import { loadSampleConfig } from './sampleConfigLoader';
 
 export class App {
   private app: Koa;
-  private pluginManager: PluginManager;
   private server: any;
+  private gatewayCore: GatewayCoreService;
 
   constructor() {
     this.app = new Koa();
-    this.pluginManager = new PluginManager();
+    const { plugins, routes } = loadSampleConfig();
+    this.gatewayCore = new GatewayCoreService(plugins, routes);
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -77,10 +79,9 @@ export class App {
         };
         return;
       }
-      await next();
+      // GatewayCore handles all other requests
+      await this.gatewayCore.processRequest(ctx);
     });
-
-    this.pluginManager.registerRoutes(this.app);
   }
 
   async start(): Promise<void> {
